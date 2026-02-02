@@ -3,11 +3,25 @@ sequenceDiagram
     participant browser
     participant server
 
-    browser->>server: POST https://studies.cs.helsinki.fi/exampleapp/new_note_spa, payload: {"content":"asd","date":"2026-02-02T12:23:43.462Z"}
+    browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/spa
     activate server
-    Note right of browser: User click makes browser send form data to server
-    server-->>browser: 201 Created, payload: {"message":"note created"}
+    server-->>browser: 200 OK -> html document
     deactivate server
 
-    Note right of browser: Browser sends new note data to server, server aknowledges that it has received the data and created a new note, page JavaScript takes care of updating the page rendering without having to fetch the complete notes data from the server again.
+    Note right of browser: Page skeleton returned
+
+    browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/spa.js
+    activate server
+    server -->>browser: 200 OK -> js JavaScript file
+    deactivate server
+
+    browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/main.css
+    activate server
+    server-->>browser: 200 OK -> css stylesheet file
+    deactivate server
+
+    browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/data.json
+    activate server
+    server -->>browser: 200 OK -> JSON file with notes data
+    deactivate server
 ```
