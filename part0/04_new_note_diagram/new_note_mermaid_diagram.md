@@ -9,7 +9,6 @@ sequenceDiagram
     server-->>browser: 302 Found -> url redirect
     deactivate server
 
-
     browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/notes
     activate server
     server -->>browser: 200 OK -> html document file
