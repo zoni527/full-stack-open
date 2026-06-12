@@ -5,9 +5,10 @@ sequenceDiagram
 
     browser->>server: POST https://studies.cs.helsinki.fi/exampleapp/new_note&note=Test
     activate server
-    Note right of browser: User click makes browser send form data to server
     server-->>browser: 302 Found -> url redirect
     deactivate server
+
+    Note right of browser: User click makes browser send form data to server, which creates a new note, then responds with a redirection to browser
 
     browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/notes
     activate server
