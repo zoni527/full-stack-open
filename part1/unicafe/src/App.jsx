@@ -16,14 +16,14 @@ const Statistics = (props) => {
   const clicks = g + b + n
 
   return (
-    <div>
+    <table>
       <StatisticLine text="good" value={g} />
       <StatisticLine text="neutral" value={n} />
       <StatisticLine text="bad" value={b} />
       <StatisticLine text="all" value={clicks} />
-      <StatisticLine text="average" value={ (g - b) / clicks } />
-      <StatisticLine text="positive" value={ ((100 * g) / clicks) + " %"} />
-    </div>
+      <StatisticLine text="average" value={ Math.round(10 * (g - b) / clicks) / 10 } />
+      <StatisticLine text="positive" value={ Math.round(((1000 * g) / clicks)) / 10 + " %"} />
+    </table>
   )
 }
 
@@ -31,7 +31,10 @@ const StatisticLine = (props) => {
   const {text, value} = props
 
   return (
-    <p>{text} {value}</p>
+    <tr>
+      <td>{text}</td>
+      <td>{value}</td>
+    </tr>
   )
 }
 
