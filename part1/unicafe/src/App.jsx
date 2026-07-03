@@ -17,12 +17,14 @@ const Statistics = (props) => {
 
   return (
     <table>
-      <StatisticLine text="good" value={g} />
-      <StatisticLine text="neutral" value={n} />
-      <StatisticLine text="bad" value={b} />
-      <StatisticLine text="all" value={clicks} />
-      <StatisticLine text="average" value={ Math.round(10 * (g - b) / clicks) / 10 } />
-      <StatisticLine text="positive" value={ Math.round(((1000 * g) / clicks)) / 10 + " %"} />
+      <tbody>
+        <StatisticLine text="good" value={g} />
+        <StatisticLine text="neutral" value={n} />
+        <StatisticLine text="bad" value={b} />
+        <StatisticLine text="all" value={clicks} />
+        <StatisticLine text="average" value={ Math.round(10 * (g - b) / clicks) / 10 } />
+        <StatisticLine text="positive" value={ Math.round(((1000 * g) / clicks)) / 10 + " %"} />
+      </tbody>
     </table>
   )
 }
