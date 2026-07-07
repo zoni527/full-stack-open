@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import { Filter, PersonForm, Persons } from './components/Components'
+import personService from './services/persons'
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -9,10 +9,10 @@ const App = () => {
   const [filterString, setFilterString] = useState('')
 
   useEffect(() => {
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        setPersons(response.data)
+    personService
+      .getAll()
+      .then(initialPersons => {
+        setPersons(initialPersons)
       })
   }, [])
 
@@ -29,21 +29,40 @@ const App = () => {
       return
     }
 
-    if (persons.find((element) => element.name === newName)) {
-      console.log('name already in phonebook')
-      alert(`${newName} is already added to the phonebook`)
+    const alreadyExistingPerson = persons.find(p => p.name === newName)
+    if (alreadyExistingPerson) {
+      if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
+        const modifiedPerson = {
+          ...alreadyExistingPerson,
+          number: newNumber
+        }
+        personService
+          .update(modifiedPerson.id, modifiedPerson)
+          .then(() => {
+            setPersons(
+              persons
+                .filter(p => p.id !== modifiedPerson.id)
+                .concat(modifiedPerson)
+            )
+            setNewName('')
+            setNewNumber('')
+          })
+      }
       return
     }
 
     const newPerson = {
       name: newName,
       number: newNumber,
-      id: persons.length + 1,
     }
 
-    setPersons(persons.concat(newPerson))
-    setNewName('')
-    setNewNumber('')
+    personService
+      .create(newPerson)
+      .then(returnedPerson => {
+        setPersons(persons.concat(returnedPerson))
+        setNewName('')
+        setNewNumber('')
+      })
   }
 
   const handleNameChange = (event) => {
@@ -75,7 +94,11 @@ const App = () => {
         handler2={handleNumberChange}
       />
       <h2>Numbers</h2>
-      <Persons list={filteredPersons} />
+      <Persons
+        list={filteredPersons}
+        persons={persons}
+        setPersons={setPersons}
+      />
     </div>
   )
 }

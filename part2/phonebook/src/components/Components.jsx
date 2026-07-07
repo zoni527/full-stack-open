@@ -1,3 +1,5 @@
+import personService from '../services/persons'
+
 const PersonForm = ({ onSubmit, val1, handler1, val2, handler2 }) => {
   return (
     <form onSubmit={onSubmit}>
@@ -19,7 +21,16 @@ const Input = ({ text, value, onChange }) => {
   )
 }
 
-const Persons = ({ list }) => {
+const Persons = ({ list, persons, setPersons }) => {
+  const deleteHandler = id => {
+    if (window.confirm(`Delete ${persons.find(p => p.id === id).name}?`)) {
+      personService.deleteId(id)
+        .then(
+          setPersons(persons.filter(p => p.id !== id))
+        )
+    }
+  }
+
   return (
     <table>
       <tbody>
@@ -27,6 +38,11 @@ const Persons = ({ list }) => {
             <tr key={person.name}>
               <td>{person.name || ' --- '}</td>
               <td>{person.number || ' --- '}</td>
+              <td>
+                <button onClick={() => deleteHandler(person.id)}>
+                  delete
+                </button>
+              </td>
             </tr>
         )}
       </tbody>
