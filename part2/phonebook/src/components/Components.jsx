@@ -21,14 +21,32 @@ const Input = ({ text, value, onChange }) => {
   )
 }
 
-const Persons = ({ list, persons, setPersons }) => {
+const Persons = ({ list, persons, setPersons, setNotification, setErrorState }) => {
   const deleteHandler = id => {
-    if (window.confirm(`Delete ${persons.find(p => p.id === id).name}?`)) {
-      personService.deleteId(id)
-        .then(
-          setPersons(persons.filter(p => p.id !== id))
-        )
-    }
+    const name = persons.find(p => p.id === id).name
+    if (!window.confirm(`Delete ${name}?`))
+      return
+
+    personService
+      .deleteId(id)
+      .then(() => {
+        setPersons(persons.filter(p => p.id !== id))
+
+        setNotification(`Deleted ${name}`)
+
+        setTimeout(() => {
+          setNotification(null)
+        }, 5000)
+      })
+      .catch(error => {
+        console.error("Error deleting person:", error)
+        setErrorState(true)
+        setNotification(`Information of ${name} has already been removed from server`)
+        setTimeout(() => {
+          setNotification(null)
+        }, 5000)
+        setPersons(persons.filter(p => p.id !== id))
+      })
   }
 
   return (
@@ -39,7 +57,9 @@ const Persons = ({ list, persons, setPersons }) => {
               <td>{person.name || ' --- '}</td>
               <td>{person.number || ' --- '}</td>
               <td>
-                <button onClick={() => deleteHandler(person.id)}>
+                <button onClick={() => {
+                deleteHandler(person.id)
+              }}>
                   delete
                 </button>
               </td>

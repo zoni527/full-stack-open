@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react'
 import { Filter, PersonForm, Persons } from './components/Components'
 import personService from './services/persons'
+import Notification from './components/Notification'
 
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filterString, setFilterString] = useState('')
+  const [notification, setNotification] = useState(null)
+  const [errorState, setErrorState] = useState(false)
 
   useEffect(() => {
     personService
@@ -44,8 +47,20 @@ const App = () => {
                 .filter(p => p.id !== modifiedPerson.id)
                 .concat(modifiedPerson)
             )
+            setNotification(`Modified ${newName}`)
+            setTimeout(() => {
+              setNotification(null)
+            }, 5000)
             setNewName('')
             setNewNumber('')
+          })
+          .catch(error => {
+            setErrorState(true)
+            setNotification(`Information of ${newName} has already been removed from server`)
+            setTimeout(() => {
+              setNotification(null)
+            }, 5000)
+            setPersons(persons.filter(p => p.id !== modifiedPerson.id))
           })
       }
       return
@@ -60,8 +75,19 @@ const App = () => {
       .create(newPerson)
       .then(returnedPerson => {
         setPersons(persons.concat(returnedPerson))
+        setNotification(`Added ${newName}`)
+        setTimeout(() => {
+          setNotification(null)
+        }, 5000)
         setNewName('')
         setNewNumber('')
+      })
+      .catch(error => {
+        setErrorState(true)
+        setNotification(`Can't add ${newName}'s information to the server`)
+        setTimeout(() => {
+          setNotification(null)
+        }, 5000)
       })
   }
 
@@ -84,6 +110,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={notification} isError={errorState} />
       <Filter value={filterString} onChange={handleFilterStringChange} />
       <h3>Add a new</h3>
       <PersonForm
@@ -98,6 +125,8 @@ const App = () => {
         list={filteredPersons}
         persons={persons}
         setPersons={setPersons}
+        setNotification={setNotification}
+        setErrorState={setErrorState}
       />
     </div>
   )
