@@ -1,7 +1,7 @@
 {
-  "name": "notebackend",
+  "name": "note_backend",
   "version": "0.0.1",
-  "description": "",
+  "description": "Backend for full stack open notes web app",
   "license": "MIT",
   "author": "Johnny Varila",
   "type": "commonjs",

@@ -1,4 +1,4 @@
-const express =require('express')
+const express = require('express')
 const app = express()
 
 app.use(express.json())
@@ -35,7 +35,7 @@ app.get('/api/notes/:id', (request, response) => {
 
   if (note)
     response.json(note)
-    else
+  else
     response.status(404).end()
 })
 
