@@ -4,6 +4,7 @@ const app = express()
 
 app.use(express.json())
 app.use(cors())
+app.use(express.static('dist'))
 
 let notes = [
   {
@@ -23,22 +24,22 @@ let notes = [
   }
 ]
 
-app.get('/', (request, response) => {
-  response.send('<h1>Hello World!</h1>')
+app.get('/', (req, res) => {
+  res.send('<h1>Hello World!</h1>')
 })
 
-app.get('/api/notes', (request, response) => {
-  response.json(notes)
+app.get('/api/notes', (req, res) => {
+  res.json(notes)
 })
 
-app.get('/api/notes/:id', (request, response) => {
-  const id = request.params.id
+app.get('/api/notes/:id', (req, res) => {
+  const id = req.params.id
   const note = notes.find(note => note.id === id)
 
   if (note)
-    response.json(note)
+    res.json(note)
   else
-    response.status(404).end()
+    res.status(404).end()
 })
 
 const generateId = () => {
@@ -49,31 +50,50 @@ const generateId = () => {
   return String(maxId + 1)
 }
 
-app.post('/api/notes', (request, response) => {
-  const body = request.body
+app.post('/api/notes', (req, res) => {
+  const body = req.body
 
   if (!body || !body.content) {
-    return response.status(400).json({
+    return res.status(400).json({
       error: 'content missing'
     })
   }
 
   const note = {
-    content: body.content,
-    imporant: body.important || false,
     id: generateId(),
+    content: body.content,
+    important: body.important || false,
   }
 
   notes = notes.concat(note)
 
-  response.json(note)
+  res.json(note)
 })
 
-app.delete('/api/notes/:id', (request, response) => {
-  const id = request.params.id
+app.put('/api/notes/:id', (req, res) => {
+  const id = req.params.id
+  const existingNote = notes.find(note => note.id === id)
+  if (!existingNote)
+    return res.status(404).end()
+
+  const body = req.body
+  if (!body || !body.content)
+    return res.status(400).json({ error: 'content missing' })
+
+  // console.log("request body:", body)
+
+  notes = notes.filter(n => n.id !== id).concat(body)
+
+  // console.log("notes:", notes)
+
+  res.json(body)
+})
+
+app.delete('/api/notes/:id', (req, res) => {
+  const id = req.params.id
   notes = notes.filter(note => note.id !== id)
 
-  response.status(204).end()
+  res.status(204).end()
 })
 
 const PORT = process.env.PORT || 3001
