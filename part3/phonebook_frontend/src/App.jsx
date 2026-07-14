@@ -55,12 +55,13 @@ const App = () => {
             setNewNumber('')
           })
           .catch(error => {
+            console.log(error)
             setErrorState(true)
-            setNotification(`Information of ${newName} has already been removed from server`)
+            setNotification(`Updating of ${newName} failed`)
             setTimeout(() => {
               setNotification(null)
+              setErrorState(false)
             }, 5000)
-            setPersons(persons.filter(p => p.id !== modifiedPerson.id))
           })
       }
       return
@@ -87,6 +88,7 @@ const App = () => {
         setNotification(`Can't add ${newName}'s information to the server`)
         setTimeout(() => {
           setNotification(null)
+          setErrorState(false)
         }, 5000)
       })
   }
