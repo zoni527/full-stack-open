@@ -106,13 +106,17 @@ app.delete('/api/persons/:id', (req, res) => {
   res.status(204).end()
 })
 
+app.put('/api/persons/:id', (req, res) => {
+  res.status(501).send({ error: 'not implemented' })
+})
+
 const unknownEndpoint = (req, res) => {
   res.status(404).send({ error: 'uknown endpoint' })
 }
 
 app.use(unknownEndpoint)
 
-const PORT = 3001
+const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
