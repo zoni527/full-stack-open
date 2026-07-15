@@ -13,6 +13,7 @@
     "build:ui": "rm -rf dist && cd ../note_frontend && npm run build && cp -r dist ../note_backend/"
   },
   "dependencies": {
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "mongoose": "^9.7.4"
   }
 }
