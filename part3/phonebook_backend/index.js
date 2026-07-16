@@ -1,9 +1,13 @@
+require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
+const Person = require('./models/person')
+
 const app = express()
 
 app.use(express.json())
 app.use(express.static('dist'))
+
 app.use(morgan((tokens, req,res) => {
   let printable = [
     tokens.method(req, res),
@@ -45,7 +49,9 @@ app.get('/', (req, res) => {
 })
 
 app.get('/api/persons', (req, res) => {
-  res.json(persons)
+  Person.find({}).then(persons => {
+    res.json(persons)
+  })
 })
 
 app.get('/api/persons/:id', (req, res) => {
@@ -89,15 +95,14 @@ app.post('/api/persons', (req, res) => {
   if (persons.filter(p => p.name === body.name).length)
     return res.status(409).json({ error: 'name must be unique' })
 
-  const p = {
-    id: generateId(),
+  const person = new Person({
     name: body.name,
     number: body.number,
-  }
+  })
 
-  persons = persons.concat(p)
-
-  res.json(p)
+  person.save().then(savedPerson => {
+    res.json(savedPerson)
+  })
 })
 
 app.delete('/api/persons/:id', (req, res) => {
