@@ -36,41 +36,25 @@ app.get('/api/notes', (req, res) => {
 })
 
 app.get('/api/notes/:id', (req, res) => {
-  const id = req.params.id
-  const note = notes.find(note => note.id === id)
-
-  if (note)
+  Note.findById(req.params.id).then(note => {
     res.json(note)
-  else
-    res.status(404).end()
+  })
 })
-
-const generateId = () => {
-  const maxId = notes.length > 0
-    ? Math.max(...notes.map(n => Number(n.id)))
-    : 0
-
-  return String(maxId + 1)
-}
 
 app.post('/api/notes', (req, res) => {
   const body = req.body
 
-  if (!body || !body.content) {
-    return res.status(400).json({
-      error: 'content missing'
-    })
-  }
+  if (!body || !body.content)
+    return res.status(400).json({ error: 'content missing' })
 
-  const note = {
-    id: generateId(),
+  const note = new Note({
     content: body.content,
     important: body.important || false,
-  }
+  })
 
-  notes = notes.concat(note)
-
-  res.json(note)
+  note.save().then(savedNote => {
+    res.json(savedNote)
+  })
 })
 
 app.put('/api/notes/:id', (req, res) => {
