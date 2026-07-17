@@ -31,7 +31,7 @@ Note.find({}).then(result => {
 //   content: 'Mongoose makes things easy',
 //   important: true,
 // })
-// 
+//
 // note.save().then(result => {
 //   console.log('note saved!')
 //   mongoose.connection.close()
