@@ -15,7 +15,7 @@ const requestLogger = (tokens, req, res) => {
     tokens.res(req, res, 'content-length'), '-',
     tokens['response-time'](req, res), 'ms'
   ]
-  if (tokens.method(req, res) === "POST")
+  if (tokens.method(req, res) === 'POST')
     printable = printable.concat(JSON.stringify(req.body))
   return printable.join(' ')
 }
@@ -60,7 +60,7 @@ app.get('/api/persons/:id', (req, res, next) => {
     .catch(error => next(error))
 })
 
-app.get('/info', (req, res) => {
+app.get('/info', (req, res, next) => {
   Person.find({}).then(persons => {
     const page = `
 <p>Phonebook has info for ${persons.length} people</p>
@@ -68,7 +68,7 @@ app.get('/info', (req, res) => {
 `
     res.send(page)
   })
-  .catch(error => next(error))
+    .catch(error => next(error))
 })
 
 app.post('/api/persons', (req, res) => {
@@ -111,7 +111,7 @@ app.put('/api/persons/:id', (req, res, next) => {
 
 app.delete('/api/persons/:id', (req, res, next) => {
   Person.findByIdAndDelete(req.params.id)
-    .then(result => {
+    .then(() => {
       res.status(204).end()
     })
     .catch(error => next(error))
