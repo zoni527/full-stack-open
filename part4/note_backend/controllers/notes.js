@@ -1,59 +1,50 @@
 const notesRouter = require('express').Router()
 const Note = require('../models/note')
 
-notesRouter.get('/', (req, res) => {
-  Note.find({}).then(notes => {
-    res.json(notes)
-  })
+notesRouter.get('/', async (request, response) => {
+  const notes = await Note.find({})
+  response.json(notes)
 })
 
-notesRouter.get('/:id', (req, res, next) => {
-  Note.findById(req.params.id)
-    .then(note => {
-      if (note)
-        res.json(note)
-      else
-        res.status(404).end()
-    })
-    .catch(error => next(error))
+notesRouter.get('/:id', async (request, response, next) => {
+  const note = await Note.findById(request.params.id)
+  if (note) {
+    response.json(note)
+  } else {
+    response.status(404).end()
+  }
 })
 
-notesRouter.post('/', (req, res, next) => {
-  const body = req.body
+notesRouter.post('/', async (request, response) => {
+  const body = request.body
 
   const note = new Note({
     content: body.content,
     important: body.important || false,
   })
 
-  note.save()
-    .then(savedNote => {
-      res.json(savedNote)
-    })
-    .catch(error => next(error))
+  const savedNote = await note.save()
+  response.status(201).json(savedNote)
 })
 
-notesRouter.delete('/:id', (req, res, next) => {
-  Note.findByIdAndDelete(req.params.id)
-    .then(() => {
-      res.status(204).end()
-    })
-    .catch(error => next(error))
+notesRouter.delete('/:id', async (request, response, next) => {
+  await Note.findByIdAndDelete(request.params.id)
+  response.status(204).end()
 })
 
-notesRouter.put('/:id', (req, res, next) => {
-  const { content, important } = req.body
+notesRouter.put('/:id', (request, response, next) => {
+  const { content, important } = request.body
 
-  Note.findById(req.params.id)
+  Note.findById(request.params.id)
     .then(note => {
       if (!note)
-        return res.status(404).end()
+        return response.status(404).end()
 
       note.content = content
       note.important = important
 
       return note.save().then((updatedNote) => {
-        res.json(updatedNote)
+        response.json(updatedNote)
       })
     })
     .catch(error => next(error))
