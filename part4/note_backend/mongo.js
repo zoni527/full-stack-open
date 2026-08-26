@@ -32,7 +32,7 @@ Note.find({}).then(result => {
 //   content: 'Candy glass confetti bear plastic lid taste tester',
 //   important: false,
 // })
-// 
+//
 // note.save().then(result => {
 //   console.log('note saved!')
 //   mongoose.connection.close()
