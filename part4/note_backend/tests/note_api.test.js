@@ -49,8 +49,6 @@ test('a valid node can be added', async () => {
   assert.strictEqual(notesAtEnd.length, helper.initialNotes.length + 1)
 
   const contents = notesAtEnd.map(n => n.content)
-  assert.strictEqual(notesAtEnd.length, helper.initialNotes.length + 1)
-
   assert(contents.includes('async/await simplifies making async calls'))
 })
 
@@ -65,7 +63,6 @@ test('note without content is not added', async () => {
     .expect(400)
 
   const notesAtEnd = await helper.notesInDb()
-
   assert.strictEqual(notesAtEnd.length, helper.initialNotes.length)
 })
 
