@@ -64,9 +64,17 @@ describe('when there is initially some notes saved', () => {
 
   describe('addition of a new note', () => {
     test('succeeds with valid data', async () => {
+      // Have to create a user first
+      const passwordHash = await bcrypt.hash('sekret', 10)
+      const user = new User({ username: 'test', passwordHash })
+      const savedUser = await user.save()
+
+      const users = await helper.usersInDb()
+
       const newNote = {
         content: 'async/await simplifies making async calls',
         important: true,
+        userId: savedUser._id,
       }
 
       await api
