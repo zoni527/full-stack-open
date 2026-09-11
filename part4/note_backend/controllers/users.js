@@ -3,12 +3,16 @@ const usersRouter = require('express').Router()
 const User = require('../models/user')
 
 usersRouter.get('/', async (request, response) => {
-  const users = await User.find({})
+  const users = await User
+    .find({}).populate('notes')
+
   response.json(users)
 })
 
 usersRouter.post('/', async (request, response) => {
   const { username, name, password } = request.body
+  if (!username || !name || !password)
+    return response.status(400).json({ error: 'user data missing' })
 
   const saltRounds = 10
   const passwordHash = await bcrypt.hash(password, saltRounds)

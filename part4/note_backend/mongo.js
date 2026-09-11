@@ -15,8 +15,16 @@ mongoose.set('strictQuery', false)
 mongoose.connect(url, { family: 4 })
 
 const noteSchema = new mongoose.Schema({
-  content: String,
+  content: {
+    type: String,
+    required: true,
+    minlength: 5
+  },
   important: Boolean,
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }
 })
 
 const Note = mongoose.model('Note', noteSchema)
