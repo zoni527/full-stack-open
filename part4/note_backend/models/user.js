@@ -7,8 +7,14 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
-  name: String,
-  passwordHash: String,
+  name: {
+    type: String,
+    minlength: 2
+  },
+  passwordHash: {
+    type: String,
+    required: true
+  },
   notes: [
     {
       type: mongoose.Schema.Types.ObjectId,
