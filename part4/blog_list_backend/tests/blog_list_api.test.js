@@ -21,7 +21,7 @@ describe('initial blogs in database', () => {
       assert.strictEqual(response.body.length, helper.initialBlogs.length)
     })
 
-    describe('ids', () =>{
+    describe('ids', () => {
       test('returned blogs have id field', async () => {
         const response = await api.get('/api/blogs')
 
@@ -46,10 +46,10 @@ describe('initial blogs in database', () => {
       }
 
       await api
-      .post('/api/blogs')
-      .send(newBlog)
-      .expect(201)
-      .expect('Content-Type', /application\/json/)
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
 
       const blogsAtEnd = await helper.blogsInDb()
       assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length + 1)
@@ -66,10 +66,10 @@ describe('initial blogs in database', () => {
       }
 
       await api
-      .post('/api/blogs')
-      .send(newBlog)
-      .expect(201)
-      .expect('Content-Type', /application\/json/)
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
 
       const blogsAtEnd = await helper.blogsInDb()
       const createdBlog = blogsAtEnd.find(b => b.author === 'test author')
@@ -84,9 +84,9 @@ describe('initial blogs in database', () => {
         }
 
         await api
-        .post('/api/blogs')
-        .send(newBlog)
-        .expect(400)
+          .post('/api/blogs')
+          .send(newBlog)
+          .expect(400)
 
         const blogsAtEnd = await helper.blogsInDb()
         assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
@@ -99,9 +99,9 @@ describe('initial blogs in database', () => {
         }
 
         await api
-        .post('/api/blogs')
-        .send(newBlog)
-        .expect(400)
+          .post('/api/blogs')
+          .send(newBlog)
+          .expect(400)
 
         const blogsAtEnd = await helper.blogsInDb()
         assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
@@ -138,12 +138,12 @@ describe('initial blogs in database', () => {
       }
 
       await api
-      .put(`/api/blogs/${blogToUpdate.id}`)
-      .send(updatedBlog)
-      .expect(200)
+        .put(`/api/blogs/${blogToUpdate.id}`)
+        .send(updatedBlog)
+        .expect(200)
 
       const blogsAtEnd = await helper.blogsInDb()
-      const changedBlog = blogsAtEnd.find(b => b.id == blogToUpdate.id)
+      const changedBlog = blogsAtEnd.find(b => b.id === blogToUpdate.id)
 
       assert(changedBlog && changedBlog.likes !== blogToUpdate.likes)
     })

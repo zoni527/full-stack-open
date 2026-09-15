@@ -31,10 +31,10 @@ blogsRouter.put('/:id', async (request, response) => {
   if (!blog)
     return response.status(404).end()
 
-  blog.author = author ? author : note.author
-  blog.title = title ? title : note.title
-  blog.url = url ? url : note.url
-  blog.likes = likes ? likes : note.likes
+  blog.author = author ? author : blog.author
+  blog.title = title ? title : blog.title
+  blog.url = url ? url : blog.url
+  blog.likes = likes ? likes : blog.likes
 
   const updatedBlog = await blog.save()
   response.json(updatedBlog)
