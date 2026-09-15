@@ -7,6 +7,7 @@ const helper = require('./test_helper')
 const bcrypt = require('bcrypt')
 const Note = require('../models/note')
 const User = require('../models/user')
+const jwt = require('jsonwebtoken')
 
 const api = supertest(app)
 
@@ -14,6 +15,13 @@ describe('when there is initially some notes saved', () => {
   beforeEach(async () => {
     await Note.deleteMany({})
     await Note.insertMany(helper.initialNotes)
+
+    await User.deleteMany({})
+
+    const passwordHash = await bcrypt.hash('sekret', 10)
+    const user = new User({ username: 'root', passwordHash })
+
+    await user.save()
   })
 
   test('notes are returned as json', async () => {
@@ -64,21 +72,23 @@ describe('when there is initially some notes saved', () => {
 
   describe('addition of a new note', () => {
     test('succeeds with valid data', async () => {
-      // Have to create a user first
-      const passwordHash = await bcrypt.hash('sekret', 10)
-      const user = new User({ username: 'test', passwordHash })
-      const savedUser = await user.save()
 
-      const users = await helper.usersInDb()
+      const response = await api
+        .post('/api/login')
+        .send({ username: 'root', password: 'sekret' })
+
+      const token = response.body.token
+      const decodedToken = jwt.verify(token, process.env.SECRET)
 
       const newNote = {
         content: 'async/await simplifies making async calls',
         important: true,
-        userId: savedUser._id,
+        userId: decodedToken.id,
       }
 
       await api
         .post('/api/notes')
+        .set('Authorization', `Bearer ${token}`)
         .send(newNote)
         .expect(201)
         .expect('Content-Type', /application\/json/)
@@ -91,9 +101,20 @@ describe('when there is initially some notes saved', () => {
     })
 
     test('note without content is not added', async () => {
-      const newNote = { important: true }
+      const response = await api
+        .post('/api/login')
+        .send({ username: 'root', password: 'sekret' })
 
-      await api.post('/api/notes').send(newNote).expect(400)
+      const token = response.body.token
+      const decodedToken = jwt.verify(token, process.env.SECRET)
+
+      const newNote = { important: true, userId: decodedToken.id }
+
+      await api
+        .post('/api/notes')
+        .set('Authorization', `Bearer ${token}`)
+        .send(newNote)
+        .expect(400)
 
       const notesAtEnd = await helper.notesInDb()
       assert.strictEqual(notesAtEnd.length, helper.initialNotes.length)
