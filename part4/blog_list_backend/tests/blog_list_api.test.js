@@ -4,17 +4,145 @@ const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
 const helper = require('./test_helper')
+const bcrypt = require('bcrypt')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 
 const api = supertest(app)
 
-describe('initial blogs in database', () => {
+describe('initial blogs and users in database', () => {
   beforeEach(async() => {
     await Blog.deleteMany({})
     await Blog.insertMany(helper.initialBlogs)
+    await User.deleteMany({})
+
+    const userData = helper.initialUsers
+    for (var i = 0; i < userData.length; ++i) {
+      const u = userData[i]
+      const passwordHash = await bcrypt.hash(u.password, 10)
+      const user = new User({ passwordHash, ...u })
+
+      await user.save()
+    }
   })
 
-  describe('GET', () => {
+  describe('GET /api/users', () => {
+    test('All users are returned', async () => {
+      const response = await api.get('/api/users')
+
+      assert(response.body.length === helper.initialUsers.length)
+    })
+  })
+
+  describe('POST /api/users', () => {
+    test('Username is required', async () => {
+      const usersAtStart = await helper.usersInDb()
+
+      const noUsername = {
+        name: 'Testy McTester',
+        password: 'sekret'
+      }
+
+      const response = await api
+        .post('/api/users')
+        .send(noUsername)
+        .expect(400)
+        .expect('Content-type', /application\/json/)
+
+      assert(response.body.error.includes('user data missing'))
+
+      const usersAtEnd = await helper.usersInDb()
+
+      assert.strictEqual(usersAtEnd.length, usersAtStart.length)
+    })
+
+    test('Password is required', async () => {
+      const usersAtStart = await helper.usersInDb()
+
+      const noPassword = {
+        username: 'testMc',
+        name: 'Testy McTester',
+      }
+
+      const response = await api
+        .post('/api/users')
+        .send(noPassword)
+        .expect(400)
+        .expect('Content-type', /application\/json/)
+
+      assert(response.body.error.includes('user data missing'))
+
+      const usersAtEnd = await helper.usersInDb()
+
+      assert.strictEqual(usersAtEnd.length, usersAtStart.length)
+    })
+
+    test('Too short username', async () => {
+      const usersAtStart = await helper.usersInDb()
+
+      const noPassword = {
+        username: 'ab',
+        name: 'Testy McTester',
+        password: 'sekret'
+      }
+
+      const response = await api
+        .post('/api/users')
+        .send(noPassword)
+        .expect(400)
+        .expect('Content-type', /application\/json/)
+
+      assert(response.body.error.includes('bad user data'))
+
+      const usersAtEnd = await helper.usersInDb()
+
+      assert.strictEqual(usersAtEnd.length, usersAtStart.length)
+    })
+
+    test('Too short password', async () => {
+      const usersAtStart = await helper.usersInDb()
+
+      const noPassword = {
+        username: 'abc',
+        name: 'Testy McTester',
+        password: 'ab'
+      }
+
+      const response = await api
+        .post('/api/users')
+        .send(noPassword)
+        .expect(400)
+        .expect('Content-type', /application\/json/)
+
+      assert(response.body.error.includes('bad user data'))
+
+      const usersAtEnd = await helper.usersInDb()
+
+      assert.strictEqual(usersAtEnd.length, usersAtStart.length)
+    })
+
+    test('Valid user is saved', async () => {
+      const usersAtStart = await helper.usersInDb()
+
+      const validUser = {
+        username: 'abc',
+        name: 'a',
+        password: 'abc'
+      }
+
+      const response = await api
+        .post('/api/users')
+        .send(validUser)
+        .expect(201)
+        .expect('Content-type', /application\/json/)
+
+      const usersAtEnd = await helper.usersInDb()
+
+      assert.strictEqual(usersAtEnd.length, usersAtStart.length + 1)
+    })
+  })
+
+  describe('GET /api/blogs', () => {
     test('all blogs are returned', async () => {
       const response = await api.get('/api/blogs')
 
@@ -36,7 +164,7 @@ describe('initial blogs in database', () => {
     })
   })
 
-  describe('POST', () => {
+  describe('POST /api/blogs', () => {
     test('a valid blog can be added', async() => {
       const newBlog = {
         author: 'test author',
@@ -109,7 +237,7 @@ describe('initial blogs in database', () => {
     })
   })
 
-  describe('DELETE', () => {
+  describe('DELETE /api/blogs', () => {
     test('deleting a blog succeeds with status code 204 if id is valid', async () => {
       const blogsAtStart = await helper.blogsInDb()
       const blogToDelete = blogsAtStart[0]
@@ -125,7 +253,7 @@ describe('initial blogs in database', () => {
     })
   })
 
-  describe('PUT', () => {
+  describe('PUT /api/blogs', () => {
     test('updating a note works', async () => {
       const blogsAtStart = await helper.blogsInDb()
       const blogToUpdate = blogsAtStart[0]
