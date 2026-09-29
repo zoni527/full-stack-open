@@ -9,10 +9,11 @@ const userSchema = new mongoose.Schema({
   },
   name: {
     type: String,
-    minlength: 2
+    minlength: 1
   },
   passwordHash: {
     type: String,
+    minlength: 8,
     required: true
   },
   notes: [
@@ -32,6 +33,4 @@ userSchema.set('toJSON', {
   }
 })
 
-const User = mongoose.model('User', userSchema)
-
-module.exports = User
+module.exports = mongoose.model('User', userSchema)
