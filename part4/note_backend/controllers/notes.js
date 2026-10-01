@@ -29,8 +29,8 @@ const getTokenFrom = request => {
 }
 
 notesRouter.post('/', async (request, response) => {
-  const body = request.body
   const decodedToken = jwt.verify(getTokenFrom(request), process.env.SECRET)
+
   if (!decodedToken.id)
     return response.status(401).json({ error: 'token invalid' })
 
@@ -39,6 +39,7 @@ notesRouter.post('/', async (request, response) => {
   if (!user)
     return response.status(400).json({ error: 'userId missing or not valid' })
 
+  const body = request.body
   const note = new Note({
     content: body.content,
     important: body.important || false,

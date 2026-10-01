@@ -72,7 +72,6 @@ describe('when there is initially some notes saved', () => {
 
   describe('addition of a new note', () => {
     test('succeeds with valid data', async () => {
-
       const response = await api
         .post('/api/login')
         .send({ username: 'root', password: 'sekret' })
@@ -173,7 +172,6 @@ describe('when there is initially one user in db', () => {
 
   test('creation fails with proper statuscode and message if username already taken', async () => {
     const usersAtStart = await helper.usersInDb()
-    console.log(usersAtStart)
 
     const newUser = {
       username: 'root',
