@@ -7,6 +7,7 @@ const helper = require('./test_helper')
 const bcrypt = require('bcrypt')
 const Blog = require('../models/blog')
 const User = require('../models/user')
+const jwt = require('jsonwebtoken')
 
 const api = supertest(app)
 
@@ -166,15 +167,27 @@ describe('initial blogs and users in database', () => {
 
   describe('POST /api/blogs', () => {
     test('a valid blog can be added', async() => {
+      const response = await api
+        .post('/api/login')
+        .send({
+          username: helper.initialUsers[0].username,
+          password: helper.initialUsers[0].password,
+        })
+
+      const token = response.body.token
+      const decodedToken = jwt.verify(token, process.env.SECRET)
+
       const newBlog = {
         author: 'test author',
         title: 'test blog',
         url: 'https://www.example.com',
         likes: 27,
+        userId: decodedToken.id,
       }
 
       await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/)
@@ -187,6 +200,16 @@ describe('initial blogs and users in database', () => {
     })
 
     test('likes defaults to 0', async() => {
+      const response = await api
+        .post('/api/login')
+        .send({
+          username: helper.initialUsers[0].username,
+          password: helper.initialUsers[0].password,
+        })
+
+      const token = response.body.token
+      const decodedToken = jwt.verify(token, process.env.SECRET)
+
       const newBlog = {
         author: 'test author',
         title: 'test blog',
@@ -195,6 +218,7 @@ describe('initial blogs and users in database', () => {
 
       await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/)
@@ -206,6 +230,16 @@ describe('initial blogs and users in database', () => {
 
     describe('required fields', () => {
       test('title is required', async () => {
+        const response = await api
+          .post('/api/login')
+          .send({
+            username: helper.initialUsers[0].username,
+            password: helper.initialUsers[0].password,
+          })
+
+        const token = response.body.token
+        const decodedToken = jwt.verify(token, process.env.SECRET)
+
         const newBlog = {
           author: 'test author',
           url: 'https://www.example.com',
@@ -213,6 +247,7 @@ describe('initial blogs and users in database', () => {
 
         await api
           .post('/api/blogs')
+          .set('Authorization', `Bearer ${token}`)
           .send(newBlog)
           .expect(400)
 
@@ -221,6 +256,16 @@ describe('initial blogs and users in database', () => {
       })
 
       test('url is required', async () => {
+        const response = await api
+          .post('/api/login')
+          .send({
+            username: helper.initialUsers[0].username,
+            password: helper.initialUsers[0].password,
+          })
+
+        const token = response.body.token
+        const decodedToken = jwt.verify(token, process.env.SECRET)
+
         const newBlog = {
           author: 'test author',
           title: 'test title',
@@ -228,6 +273,7 @@ describe('initial blogs and users in database', () => {
 
         await api
           .post('/api/blogs')
+          .set('Authorization', `Bearer ${token}`)
           .send(newBlog)
           .expect(400)
 
