@@ -207,6 +207,27 @@ describe('initial blogs and users in database', () => {
       assert(authors.includes('test author'))
     })
 
+    test('no token returns 401', async() => {
+      const decodedToken = jwt.verify(token, process.env.SECRET)
+      const newBlog = {
+        author: 'test author',
+        title: 'test blog',
+        url: 'https://www.example.com',
+        likes: 27,
+        userId: decodedToken.id,
+      }
+
+      await api
+        .post('/api/blogs')
+        .set('Authorization', 'Bearer abc')
+        .send(newBlog)
+        .expect(401)
+        .expect('Content-Type', /application\/json/)
+
+      const blogsAtEnd = await helper.blogsInDb()
+      assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
+    })
+
     test('likes defaults to 0', async() => {
       const newBlog = {
         author: 'test author',
@@ -266,7 +287,7 @@ describe('initial blogs and users in database', () => {
       const blogsAtStart = await helper.blogsInDb()
       const blogToDelete = blogsAtStart[0]
 
-      const res = await api
+      await api
         .delete(`/api/blogs/${blogToDelete.id}`)
         .set('Authorization', `Bearer ${token}`)
         .expect(204)
