@@ -10,21 +10,36 @@ const User = require('../models/user')
 const jwt = require('jsonwebtoken')
 
 const api = supertest(app)
+let token = null
 
 describe('initial blogs and users in database', () => {
-  beforeEach(async() => {
-    await Blog.deleteMany({})
-    await Blog.insertMany(helper.initialBlogs)
+  beforeEach(async () => {
     await User.deleteMany({})
+    await Blog.deleteMany({})
 
-    const userData = helper.initialUsers
-    for (var i = 0; i < userData.length; ++i) {
-      const u = userData[i]
+    for (const u of helper.initialUsers) {
       const passwordHash = await bcrypt.hash(u.password, 10)
       const user = new User({ passwordHash, ...u })
 
       await user.save()
     }
+
+    const rootUser = await User.findOne({ username: helper.initialUsers[0]. username })
+
+    const blogObjects = helper.initialBlogs.map(b => ({
+      ...b,
+      user: rootUser._id
+    }))
+    await Blog.insertMany(blogObjects)
+
+    const loginResponse = await api
+      .post('/api/login')
+      .send({
+        username: helper.initialUsers[0].username,
+        password: helper.initialUsers[0].password
+      })
+
+    token = loginResponse.body.token
   })
 
   describe('GET /api/users', () => {
@@ -168,14 +183,6 @@ describe('initial blogs and users in database', () => {
 
   describe('POST /api/blogs', () => {
     test('a valid blog can be added', async() => {
-      const response = await api
-        .post('/api/login')
-        .send({
-          username: helper.initialUsers[0].username,
-          password: helper.initialUsers[0].password,
-        })
-
-      const token = response.body.token
       const decodedToken = jwt.verify(token, process.env.SECRET)
 
       const newBlog = {
@@ -201,16 +208,6 @@ describe('initial blogs and users in database', () => {
     })
 
     test('likes defaults to 0', async() => {
-      const response = await api
-        .post('/api/login')
-        .send({
-          username: helper.initialUsers[0].username,
-          password: helper.initialUsers[0].password,
-        })
-
-      const token = response.body.token
-      jwt.verify(token, process.env.SECRET)
-
       const newBlog = {
         author: 'test author',
         title: 'test blog',
@@ -231,16 +228,6 @@ describe('initial blogs and users in database', () => {
 
     describe('required fields', () => {
       test('title is required', async () => {
-        const response = await api
-          .post('/api/login')
-          .send({
-            username: helper.initialUsers[0].username,
-            password: helper.initialUsers[0].password,
-          })
-
-        const token = response.body.token
-        jwt.verify(token, process.env.SECRET)
-
         const newBlog = {
           author: 'test author',
           url: 'https://www.example.com',
@@ -257,16 +244,6 @@ describe('initial blogs and users in database', () => {
       })
 
       test('url is required', async () => {
-        const response = await api
-          .post('/api/login')
-          .send({
-            username: helper.initialUsers[0].username,
-            password: helper.initialUsers[0].password,
-          })
-
-        const token = response.body.token
-        jwt.verify(token, process.env.SECRET)
-
         const newBlog = {
           author: 'test author',
           title: 'test title',
@@ -289,7 +266,10 @@ describe('initial blogs and users in database', () => {
       const blogsAtStart = await helper.blogsInDb()
       const blogToDelete = blogsAtStart[0]
 
-      await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204)
+      const res = await api
+        .delete(`/api/blogs/${blogToDelete.id}`)
+        .set('Authorization', `Bearer ${token}`)
+        .expect(204)
 
       const blogsAtEnd = await helper.blogsInDb()
 
