@@ -140,6 +140,7 @@ describe('initial blogs and users in database', () => {
       const usersAtEnd = await helper.usersInDb()
 
       assert.strictEqual(usersAtEnd.length, usersAtStart.length + 1)
+      assert.strictEqual(response.body.username, 'abc')
     })
   })
 
@@ -208,7 +209,7 @@ describe('initial blogs and users in database', () => {
         })
 
       const token = response.body.token
-      const decodedToken = jwt.verify(token, process.env.SECRET)
+      jwt.verify(token, process.env.SECRET)
 
       const newBlog = {
         author: 'test author',
@@ -238,7 +239,7 @@ describe('initial blogs and users in database', () => {
           })
 
         const token = response.body.token
-        const decodedToken = jwt.verify(token, process.env.SECRET)
+        jwt.verify(token, process.env.SECRET)
 
         const newBlog = {
           author: 'test author',
@@ -264,7 +265,7 @@ describe('initial blogs and users in database', () => {
           })
 
         const token = response.body.token
-        const decodedToken = jwt.verify(token, process.env.SECRET)
+        jwt.verify(token, process.env.SECRET)
 
         const newBlog = {
           author: 'test author',
