@@ -12,6 +12,9 @@ const App = () => {
   const [showAll, setShowAll] = useState(true)
   const [errorMessage, setErrorMessage] = useState(null)
   const [user, setUser] = useState(null)
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [loginVisible, setLoginVisible] = useState(false)
 
   useEffect(() => {
     noteService
@@ -73,7 +76,9 @@ const App = () => {
     ? notes
     : notes.filter(note => note.important)
 
-  const handleLogin = async (username, password) => {
+  const handleLogin = async (event) => {
+    event.preventDefault()
+
     try {
       const user = await loginService.login({ username, password })
 
@@ -82,16 +87,14 @@ const App = () => {
       )
       noteService.setToken(user.token)
       setUser(user)
-
-      return { success: true }
+      setUsername('')
+      setPassword('')
     } catch (exception) {
       console.log(exception)
       setErrorMessage('wrong credentials')
       setTimeout(() => {
         setErrorMessage(null)
       }, 5000)
-
-      return { success: false }
     }
   }
 
@@ -108,12 +111,35 @@ const App = () => {
     </form>
   )
 
+  const loginForm = () => {
+    const hideWhenVisible = { display: loginVisible ? 'none' : '' }
+    const showWhenVisible = { display: loginVisible ? '' : 'none' }
+
+    return (
+      <div>
+        <div style={hideWhenVisible}>
+          <button onClick={() => setLoginVisible(true)}>log in</button>
+        </div>
+        <div style={showWhenVisible}>
+          <LoginForm
+            username={username}
+            password={password}
+            handleUsernameChange={({ target }) => setUsername(target.value)}
+            handlePasswordChange={({ target }) => setPassword(target.value)}
+            handleSubmit={handleLogin}
+          />
+          <button onClick={() => setLoginVisible(false)}>cancel</button>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div>
       <h1>Notes</h1>
       <Notification message={errorMessage} />
 
-      {!user && (<LoginForm onLogin={handleLogin} />)}
+      {!user && loginForm()}
       {user && (
         <div>
           <p>{user.name} logged in&nbsp;
