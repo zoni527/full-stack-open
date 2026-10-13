@@ -26,10 +26,6 @@ const App = () => {
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
     }
-    setNotification('abc')
-    setTimeout(() => {
-      setNotification('')
-    }, 5000)
   }, [])
 
   if (!user) {
@@ -52,14 +48,14 @@ const App = () => {
             console.log(user)
             setUser(user)
             window.localStorage.setItem('loggedBloglistAppUser', JSON.stringify(user))
+            setNotificationIsError(false)
+            setNotification(`${user.username} logged in succesfully`)
+            setTimeout(() => setNotification(''), 5000)
           } catch (exception) {
             console.log(exception)
             setNotificationIsError(true)
             setNotification('wrong username or password')
-            setTimeout(() => {
-              setNotification('')
-              setNotificationIsError(false)
-            }, 5000)
+            setTimeout(() => setNotification(''), 5000)
           }
         }}>
           <div>
@@ -89,10 +85,20 @@ const App = () => {
   return (
     <div>
       <h2>blogs</h2>
+      {notification && (
+        <div
+          className={notificationIsError ? 'error' : 'notification'}>{notification}
+        </div>
+      )}
       <p>{user.name} logged in
         <button onClick={() => {
+          setNotificationIsError(false)
+          setNotification(`${user.username} logged out succesfully`)
           setUser(null)
+          setUsername('')
+          setPassword('')
           window.localStorage.removeItem('loggedBloglistAppUser')
+          setTimeout(() => setNotification(''), 5000)
         }}>
           logout
         </button>
@@ -123,8 +129,15 @@ const App = () => {
           setAuthor('')
           setUrl('')
           setBlogs(blogs.concat(response.data))
+          setNotificationIsError(false)
+          setNotification(`a new blog ${response.data.title} by ${response.data.author} added`)
+          setTimeout(() => setNotification(''), 5000)
+
         } catch (exception) {
           console.log(exception)
+          setNotificationIsError(true)
+          setNotification("error creating new blog")
+          setTimeout(() => setNotification(''), 5000)
         }
       }}>
         <div>
