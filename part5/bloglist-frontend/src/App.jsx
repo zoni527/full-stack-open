@@ -99,6 +99,21 @@ const App = () => {
     )
   }
 
+  const handleLike = async (blogToLike) => {
+    const updatedBlogObject = {
+      ...blogToLike,
+      likes: blogToLike.likes + 1,
+      user: blogToLike.user?.id || blogToLike.user
+    }
+
+    try {
+      const returnedBlog = await blogService.update(blogToLike.id, updatedBlogObject)
+      setBlogs(blogs.map(b => b.id === blogToLike.id ? { ...blogToLike, likes: returnedBlog.likes } : b))
+    } catch (exception) {
+      console.error('Failed to update likes', exception)
+    }
+  }
+
   return (
     <div>
       <h2>blogs</h2>
@@ -120,7 +135,7 @@ const App = () => {
         />
       </Togglable>
       {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
+        <Blog key={blog.id} blog={blog} handleLike={handleLike} />
       )}
     </div>
   )
