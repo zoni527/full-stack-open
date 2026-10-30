@@ -1,9 +1,9 @@
 import axios from 'axios'
 const baseUrl = '/api/blogs'
 
-const getAll = () => {
-  const request = axios.get(baseUrl)
-  return request.then(response => response.data)
+const getAll = async () => {
+  const response = await axios.get(baseUrl)
+  return response.data
 }
 
 const update = async (id, newObject) => {
@@ -16,9 +16,8 @@ const create = async (newObject) => {
   return request.data
 }
 
-const deleteBlog = async (id) => {
-  const request = await axios.delete(`${baseUrl}/${id}`)
-  return request.data
+const remove = async (id, config) => {
+  await axios.delete(`${baseUrl}/${id}`, config)
 }
 
-export default { getAll, update, create, deleteBlog }
+export default { getAll, update, create, remove }
