@@ -30,7 +30,7 @@ const LoginForm = ({ notification, notificationIsError, handleLogin }) => {
             <input
               type="text"
               value={username}
-              onChange={({target}) => setUsername(target.value)}
+              onChange={({ target }) => setUsername(target.value)}
             />
           </label>
         </div>
@@ -39,7 +39,7 @@ const LoginForm = ({ notification, notificationIsError, handleLogin }) => {
             <input
               type="password"
               value={password}
-              onChange={({target}) => setPassword(target.value)}
+              onChange={({ target }) => setPassword(target.value)}
             />
           </label>
         </div>

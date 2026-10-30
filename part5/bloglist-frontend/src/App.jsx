@@ -58,10 +58,10 @@ const App = () => {
 
     console.log(user)
     console.log(blogObject)
-    console.log("sending blog")
+    console.log('sending blog')
 
     try {
-      const response = await axios.post("/api/blogs", blogObject, config)
+      const response = await axios.post('/api/blogs', blogObject, config)
 
       console.log(response.data)
       blogFormRef.current.toggleVisibility()
@@ -74,7 +74,7 @@ const App = () => {
     } catch (exception) {
       console.log(exception)
       setNotificationIsError(true)
-      setNotification("error creating new blog")
+      setNotification('error creating new blog')
       setTimeout(() => setNotification(''), 5000)
 
       return false

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-const BlogForm = ({ notification, notificationIserror, createBlog }) => {
+const BlogForm = ({ createBlog }) => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
@@ -23,7 +23,7 @@ const BlogForm = ({ notification, notificationIserror, createBlog }) => {
             <input
               type="text"
               value={title}
-              onChange={({target}) => setTitle(target.value)}
+              onChange={({ target }) => setTitle(target.value)}
             />
           </label>
         </div>
@@ -32,7 +32,7 @@ const BlogForm = ({ notification, notificationIserror, createBlog }) => {
             <input
               type="text"
               value={author}
-              onChange={({target}) => setAuthor(target.value)}
+              onChange={({ target }) => setAuthor(target.value)}
             />
           </label>
         </div>
@@ -41,7 +41,7 @@ const BlogForm = ({ notification, notificationIserror, createBlog }) => {
             <input
               type="text"
               value={url}
-              onChange={({target}) => setUrl(target.value)}
+              onChange={({ target }) => setUrl(target.value)}
             />
           </label>
         </div>
