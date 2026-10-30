@@ -20,7 +20,8 @@ const Blog = ({ blog, handleLike }) => {
           <div>
             {blog.url}<br/>
             likes {blog.likes}<button onClick={() => handleLike(blog)}>like</button><br/>
-            {blog.user && blog.user.name || 'no user assigned' }
+            {blog.user && blog.user.name || 'no user assigned'}<br />
+            <button onClick={() => }>remove</button>
           </div>
         )}
       </div>
