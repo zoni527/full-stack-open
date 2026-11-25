@@ -11,7 +11,7 @@ describe('<Togglable />', () => {
     )
   })
 
-  test('renders its children',() => {
+  test('renders its children', () => {
     screen.getByText('togglable content')
   })
 
